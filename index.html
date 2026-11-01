@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101827">
+<title>Pak Working</title>
+<style>
+:root{--bg:#0b1220;--panel:#111c2e;--panel2:#18263b;--text:#f5f7fb;--muted:#9eacc2;--green:#22c55e;--cyan:#38bdf8;--line:#26364d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{position:sticky;top:0;z-index:5;background:#101827ed;backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:13px 16px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-size:21px;font-weight:850;letter-spacing:.2px}.brand span{color:var(--green)}.tag{font-size:11px;color:var(--muted)}
+main{max-width:760px;margin:0 auto;padding:14px 14px 90px}.tabs{position:fixed;bottom:0;left:0;right:0;z-index:8;display:flex;justify-content:space-around;background:#101827f5;border-top:1px solid var(--line);padding:9px 3px calc(9px + env(safe-area-inset-bottom))}
+.tabs button{background:none;border:0;color:var(--muted);font-size:11px;display:grid;gap:3px;justify-items:center;min-width:55px}.tabs button b{font-size:19px}.tabs button.active{color:var(--green)}
+h1{font-size:25px;margin:10px 0 5px}h2{font-size:18px;margin:0 0 10px}.muted{color:var(--muted)}.small{font-size:12px;color:var(--muted)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:15px;margin:12px 0}
+.hero{background:linear-gradient(135deg,#123d36,#14243c 65%,#20304a);border:1px solid #28544d;border-radius:20px;padding:19px;margin:10px 0 16px}
+.hero h1{font-size:27px;margin:0 0 7px}.hero p{color:#d0e6df;margin:0 0 14px;line-height:1.5}
+button,.btn{border:0;border-radius:11px;background:var(--green);color:#06210f;padding:11px 14px;font-weight:750;cursor:pointer}
+button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
+input,textarea,select{width:100%;background:#0c1626;border:1px solid var(--line);border-radius:10px;padding:12px;color:var(--text);margin:6px 0 12px;font:inherit}
+label{font-size:13px;color:#cbd5e1}.row{display:flex;gap:9px;align-items:center}.row>*{flex:1}.pill{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:5px 9px;color:var(--muted);font-size:11px}
+.feed{display:grid;gap:13px}.video{position:relative;background:#05090f;border-radius:18px;overflow:hidden;min-height:340px;display:grid;place-items:center}
+.video video{width:100%;max-height:68vh;object-fit:contain;background:#05090f}.video .placeholder{padding:45px 20px;text-align:center;color:#b8c6d9}
+.video-meta{padding:12px 2px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.actions button{background:var(--panel2);color:var(--text);border:1px solid var(--line);padding:8px 12px}
+.profile-head{display:flex;align-items:center;gap:13px}.avatar{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#38bdf8);display:grid;place-items:center;color:#082012;font-weight:900;font-size:22px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}.stat{background:var(--panel2);border-radius:12px;padding:12px;text-align:center}.stat strong{display:block;font-size:19px}
+.hidden{display:none!important}.notice{background:#332b16;border:1px solid #675323;color:#f5dda0;border-radius:12px;padding:11px;font-size:12px;line-height:1.5}
+.empty{text-align:center;padding:28px 15px;color:var(--muted)}.live-dot{color:#ff6262;font-weight:800}
+footer{text-align:center;color:#718096;font-size:11px;padding:15px}
+@media(min-width:700px){main{padding-top:22px}.video{min-height:420px}}
+</style>
+</head>
+<body>
+<header><div><div class="brand">Pak <span>Working</span></div><div class="tag">Pakistan's community video space</div></div><span class="pill">BETA DEMO</span></header>
+<main>
+<section id="home" class="page">
+ <div class="hero"><h1>Apni video, apni awaaz 🇵🇰</h1><p>Short videos share karein, creators ko discover karein aur apni community banayein.</p><button onclick="showPage('create')">＋ Video upload karein</button></div>
+ <div class="row"><h2>For You</h2><span class="pill">Latest videos</span></div>
+ <div id="feed" class="feed"><div class="empty">Abhi videos nahi hain. Pehli video upload karein!</div></div>
+</section>
+<section id="discover" class="page hidden">
+ <h1>Discover</h1><p class="muted">Creators aur videos explore karein.</p>
+ <input id="search" placeholder="Video ya creator search karein..." oninput="renderFeed()">
+ <div id="discoverFeed" class="feed"></div>
+</section>
+<section id="create" class="page hidden">
+ <h1>Create a post</h1><div class="card">
+ <label>Video select karein</label><input id="videoFile" type="file" accept="video/*">
+ <label>Caption</label><textarea id="caption" rows="3" placeholder="Aaj ki video ke bare mein likhein..."></textarea>
+ <button onclick="uploadVideo()">Video publish karein</button>
+ <p class="small">Demo mein video isi browser/device par rahegi. Public sharing ke liye online storage/backend connect karna hoga.</p>
+ </div>
+ <div class="notice">Abhi yeh starter demo hai. Is mein asli user accounts, cloud video hosting, live streaming aur payments connect nahi hain.</div>
+</section>
+<section id="live" class="page hidden">
+ <h1>Live</h1><div class="card">
+ <div class="video"><div class="placeholder"><div style="font-size:42px">🔴</div><h2>Live streaming</h2><p>Live video feature aglay development stage mein streaming service se connect hoga.</p></div></div>
+ <p class="muted">Creators live aa sakenge, viewers chat aur gifts bhej sakenge jab backend aur live provider integrate ho jayega.</p>
+ <button class="secondary" onclick="alert('Live streaming abhi demo mein enabled nahi hai.')">Go Live (coming soon)</button>
+ </div>
+</section>
+<section id="profile" class="page hidden">
+ <h1>Profile</h1><div class="card">
+ <div class="profile-head"><div class="avatar" id="avatar">U</div><div><strong id="profileName">Usman Ghani</strong><div class="small">Pak Working creator</div></div></div>
+ <label>Your display name</label><input id="nameInput" value="Usman Ghani">
+ <label>Bio</label><textarea id="bioInput" rows="2" placeholder="Apne bare mein likhein"></textarea>
+ <button onclick="saveProfile()">Profile save karein</button>
+ <div class="stats"><div class="stat"><strong id="postCount">0</strong><span class="small">Videos</span></div><div class="stat"><strong>0</strong><span class="small">Followers</span></div><div class="stat"><strong>0</strong><span class="small">Following</span></div></div>
+ </div>
+ <div class="card"><h2>Wallet</h2><div style="font-size:26px;font-weight:850">Rs 0.00</div><p class="small">Demo balance — yeh real paisa ya withdrawable earning nahi hai.</p><button class="secondary" onclick="alert('Real payments abhi integrate nahi hain.')">Withdrawal (coming soon)</button></div>
+ <div class="notice">Support contact: 03464800044. Public app mein personal payment account details show na karein.</div>
+</section>
+<footer>Pak Working • Demo build • Be respectful. Report harmful content.</footer>
+</main>
+<nav class="tabs">
+ <button class="active" data-page="home" onclick="showPage('home',this)"><b>⌂</b>Home</button>
+ <button data-page="discover" onclick="showPage('discover',this)"><b>⌕</b>Discover</button>
+ <button data-page="create" onclick="showPage('create',this)"><b>＋</b>Create</button>
+ <button data-page="live" onclick="showPage('live',this)"><b>◉</b>Live</button>
+ <button data-page="profile" onclick="showPage('profile',this)"><b>♙</b>Profile</button>
+</nav>
+<script>
+let posts=[];
+function showPage(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));let b=btn||document.querySelector('[data-page="'+id+'"]');if(b)b.classList.add('active');}
+function uploadVideo(){
+ const f=document.getElementById('videoFile').files[0], caption=document.getElementById('caption').value.trim();
+ if(!f){alert('Pehle video select karein.');return}
+ if(!f.type.startsWith('video/')){alert('Video file select karein.');return}
+ const url=URL.createObjectURL(f);
+ posts.unshift({id:Date.now(),url,caption:caption||'My new video',name:document.getElementById('profileName').textContent,likes:0,liked:false,fileName:f.name});
+ document.getElementById('videoFile').value='';document.getElementById('caption').value='';renderFeed();showPage('home');
+}
+function renderFeed(){
+ const q=(document.getElementById('search')?.value||'').toLowerCase();
+ const filtered=posts.filter(p=>(p.caption+' '+p.name).toLowerCase().includes(q));
+ const markup=filtered.map(p=>`<article class="card"><div class="video"><video src="${p.url}" controls playsinline loop></video></div><div class="video-meta"><strong>${escapeHtml(p.name)}</strong><div>${escapeHtml(p.caption)}</div><div class="actions"><button onclick="likePost(${p.id})">♥ ${p.likes}</button><button onclick="sharePost(${p.id})">↗ Share</button><button onclick="commentPost()">Comment</button></div></div></article>`).join('')||'<div class="empty">Koi video nahi mili. Pehli video upload karein!</div>';
+ document.getElementById('feed').innerHTML=markup;document.getElementById('discoverFeed').innerHTML=markup;document.getElementById('postCount').textContent=posts.length;
+}
+function likePost(id){let p=posts.find(x=>x.id===id);if(p){p.likes++;renderFeed()}}
+function sharePost(id){let p=posts.find(x=>x.id===id);if(navigator.share){navigator.share({title:'Pak Working',text:p.caption,url:location.href}).catch(()=>{})}else{navigator.clipboard?.writeText(location.href);alert('App link copy karne ki koshish ki gayi.')}} 
+function commentPost(){alert('Comments ko aglay version mein backend ke sath enable kiya jayega.')}
+function saveProfile(){let n=document.getElementById('nameInput').value.trim()||'Creator';document.getElementById('profileName').textContent=n;document.getElementById('avatar').textContent=n[0].toUpperCase();renderFeed();alert('Profile is device par save ho gayi.')}
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+renderFeed();
+</script>
+</body></html>
